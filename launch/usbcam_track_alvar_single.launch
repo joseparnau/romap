@@ -1,0 +1,13 @@
+<launch>
+
+	<node pkg="tf" type="static_transform_publisher" name="usbcam_broadcaster" args="0 0 0 0 0 0 1 /world /head_camera 100" />
+
+	<node name="usb_cam" pkg="usb_cam" type="usb_cam_node" />
+	
+	<include file="$(find romap)/usbcam_alvar_track_simple.launch" />
+	
+	<env name="ROS_NAMESPACE" value="usb_cam" />
+	<node name="image_proc" pkg="image_proc" type="image_proc" />
+
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find romap)/usbcam_alvar.rviz" />
+</launch>

@@ -1,0 +1,25 @@
+<launch>
+	
+	<node name="ardrone_autonomy" pkg="ardrone_autonomy" type="ardrone_driver" />
+	
+	<group ns="mark_0">
+		<include file="$(find romap)/alvar_bundle-single_0_185mm.launch" />
+	</group>
+	<group ns="mark_1">
+		<include file="$(find romap)/alvar_bundle-single_1_185mm.launch" />
+	</group>
+	<group ns="mark_2">
+		<include file="$(find romap)/alvar_bundle-single_2_185mm.launch" />
+	</group>
+	<group ns="mark_3">
+		<include file="$(find romap)/alvar_bundle-single_3_185mm.launch" />
+	</group>
+	<group ns="mark_4">
+		<include file="$(find romap)/alvar_bundle-single_4_185mm.launch" />
+	</group>
+
+	<env name="ROS_NAMESPACE" value="ardrone/front" />
+	<node name="image_proc" pkg="image_proc" type="image_proc" />
+	
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find romap)/ardrone_alvar.rviz" />
+</launch>

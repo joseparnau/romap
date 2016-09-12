@@ -1,0 +1,17 @@
+<launch>
+	<node pkg="tf" type="static_transform_publisher" name="tcp_broadcaster" args="0 0 0 0 0 0 1 /world /odom 100" />
+	
+	<node pkg="tf" type="static_transform_publisher" name="ardrone_cam_broadcaster" args="0 0 0 0 0 0 1 /ardrone_base_frontcam /camera 100" />
+	
+	<include file="$(find romap)/launch/ardrone_ioc.launch" />
+	
+	<include file="$(find romap)/alvar_marks/alvar_cube_125mm.launch" />
+	
+	<arg name="security" default="1"/>
+	<node name="ardrone_manager" pkg="romap" type="ardrone_manager" output="screen" args="$(arg security)"/>
+
+	<env name="ROS_NAMESPACE" value="ardrone/front" />
+	<node name="image_proc" pkg="image_proc" type="image_proc" />
+	
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find romap)/rviz/ardrone_alvar.rviz" />
+</launch>

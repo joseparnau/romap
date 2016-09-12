@@ -1,0 +1,9 @@
+<launch>
+
+	<include file="$(find romap)/launch/ardrone_ioc.launch" />
+	
+<!--	<arg name="security" default="1"/>
+	<node name="ardrone_manager" pkg="romap" type="ardrone_manager" output="screen" args="$(arg security)"/>-->
+
+	<node name="teleop_ardrone" pkg="romap" type="ardrone_key_teleop" output="screen"/>
+</launch>

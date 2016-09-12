@@ -1,0 +1,30 @@
+<launch>
+
+	<node pkg="tf" type="static_transform_publisher" name="tcp_broadcaster" args="0 0 0 0 0 0 1 /world /odom 100" />
+	<node pkg="tf" type="static_transform_publisher" name="ardrone_cam_broadcaster" args="0 0 0 0 0 0 1 /ardrone_base_frontcam /camera 100" />
+	
+	<!--UGA TUM-->
+	<!--  ardrone autonomy driver UGA-TUM version -->
+	<include file="$(find uga_tum_ardrone)/launch/ardrone_driver.launch" />
+	<!--  odometry, control and GUI -->
+	<include file="$(find uga_tum_ardrone)/launch/uga_tum_ardrone.launch" />
+
+<!--	<node name="drone_stateestimation" pkg="uga_tum_ardrone" type="drone_stateestimation" />
+	<node name="drone_autopilot" pkg="uga_tum_ardrone" type="drone_autopilot" />
+	<arg name="drone_ip" default="127.0.0.1"/>
+	<node name="drone_gui" pkg="uga_tum_ardrone" type="drone_gui">
+	      <param name="DroneIP" value="$(arg drone_ip)"/>
+	</node>-->
+	
+	<!--ALVAR-->
+	<include file="$(find romap)/alvar_marks/alvar_cube_125mm.launch" />
+
+	<!--ROMAP-->
+	<arg name="security" default="1"/>
+	<node name="tum_ardrone_manager" pkg="romap" type="tum_ardrone_manager" output="screen" args="$(arg security)"/>
+
+	<!--RVIZ-->
+	<env name="ROS_NAMESPACE" value="ardrone/front" />
+	<node name="image_proc" pkg="image_proc" type="image_proc" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find romap)/rviz/ardrone_alvar.rviz" />
+</launch>

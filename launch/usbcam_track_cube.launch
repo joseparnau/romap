@@ -1,0 +1,26 @@
+<launch>
+	
+	<node pkg="tf" type="static_transform_publisher" name="tcp_broadcaster" args="0 0 0 0 0 0 1 /world /tcp 100" />
+	
+	<node pkg="tf" type="static_transform_publisher" name="usbcam_cam_broadcaster" args="0 0 0 0 0 0 1 /camera /head_camera 100" />
+
+	<node name="usb_cam" pkg="usb_cam" type="usb_cam_node" />
+
+	<arg name="marker_size" default="12.5" />
+	<arg name="max_new_marker_error" default="0.08" />
+	<arg name="max_track_error" default="0.2" />
+        
+	<arg name="cam_image_topic" default="/usb_cam/image_raw" />
+	<arg name="cam_info_topic" default="/usb_cam/camera_info" />
+	<arg name="output_frame" default="/head_camera" />
+	
+	<arg name="bundle_file" default="$(find romap)/alvar_marks/alvar_cube_125mm.xml" />
+
+	<node name="tcp2cam_cube" pkg="romap" type="tcp2cam_cube" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame) $(arg bundle_file)" />
+	
+<!--	<env name="ROS_NAMESPACE" value="usb_cam" />
+	<node name="image_proc" pkg="image_proc" type="image_proc" />-->
+
+<!-- 	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find romap)/rviz/usbcam_alvar.rviz" /> -->
+
+</launch>

@@ -1,0 +1,14 @@
+<launch>
+	<arg name="marker_size" default="12.5" />
+	<arg name="max_new_marker_error" default="0.08" />
+	<arg name="max_track_error" default="0.2" />
+        
+	<arg name="cam_image_topic" default="/ardrone/front/image_raw" />
+	<arg name="cam_info_topic" default="/ardrone/front/camera_info" />
+	<arg name="output_frame" default="/ardrone_base_frontcam" />
+	
+	<arg name="bundle_file" default="$(find romap)/alvar_marks/alvar_cube_125mm.xml" />
+
+<!--	<node name="ar_track_alvar" pkg="ar_track_alvar" type="findMarkerBundlesNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame) $(arg bundle_files)" />-->
+	<node name="tcp2cam_cube" pkg="romap" type="tcp2cam_cube" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame) $(arg bundle_file)" />
+</launch>
