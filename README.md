@@ -1,6 +1,6 @@
 # romap
 
-ROS node that contains the manager node for the coordination of a Mobile Manipulator and a UAV using a single haptic device.
+ROS node that contains the UAV manager node for the coordination of a Mobile Manipulator and a UAV using a single haptic device.
 
 This node implements the UAV code for:
 * Teleoperating a mobile manipulator and a free-flying camera from a single haptic device, JA Claret, I Zaplana, L Basanez - 2016 IEEE International Symposium on Safety, Security, and Rescue Robotics (SSRR), 2016
