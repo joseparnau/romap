@@ -38,6 +38,15 @@
   date:         November 2015
 */
 
+/*
+ * 
+ * ROS node that computes the pose of a cube w.r.t. a camera from the poses of its sides,
+ *  which contain markers that the camera can detect.
+ * 
+ * The node publishes the pose of the cube.
+ * 
+ */
+
 
 #include "ros/ros.h"
 #include <std_msgs/Bool.h>

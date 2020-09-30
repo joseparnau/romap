@@ -34,6 +34,21 @@
   author: Josep Arnau Claret Robert
 */
 
+/*
+ * 
+ * ROS node that allows the tracking of a cube (with markers) by a Parrot Ardrone.
+ * 
+ * The node implements the state machine of the UAV. 
+ * 
+ * To start commanding the drone first do:
+ *  $ rosservice call /track_tcp "track_tcp: true"
+ *  The ardrone state will change from STATE_REST to STATE_SEARCH
+ *  Once the cube is detected the state will automatically change from STATE_SEARCH to STATE_TRACK
+ *  In the state STATE_TRACK the tracking controller will automatically be started
+ * 
+ */
+
+
 #include <sstream>
 #include <fstream>
 #include <vector>
@@ -344,44 +359,6 @@ int main(int argc, char *argv[])
 	  flattrim_calibrated = true;
 	  ROS_INFO ("Flattrim Calibration DONE");
 	}
-	
-// 	std::cout << "tcp - cam: " <<desired_TF_tcp_cam.getOrigin().x()<<" "  
-// 				   <<desired_TF_tcp_cam.getOrigin().y()<<" " 
-// 				   <<desired_TF_tcp_cam.getOrigin().z()<<std::endl;
-	
-	// To start commanding the drone first do:
-	//  $ rosservice call /track_tcp "track_tcp: true"
-	//  The ardrone state will change from STATE_REST to STATE_SEARCH
-	//  Once the cube is detected the state will automatically change from STATE_SEARCH to STATE_TRACK
-	//  In the state STATE_TRACK the tracking controller will automatically be started
-
-
-	// TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
-	if (flattrim_calibrated && (ardrone_state == ARDRONE_LANDED) && tcp_detected)
-	{
-// 	  std::cout << "In control test!" << std::endl;
-	  
-	  Eigen::VectorXd u_drone(computeDroneVelocityCommand(time_diff, TF_drone_tcp, pastTF_drone_tcp, desired_TF_drone_tcp, pastDesired_TF_drone_tcp));
-	  double ux = u_drone(0);
-	  double uy = u_drone(1);
-	  double uz = u_drone(2);
-	  double ut = u_drone(3);	  
-	  
-	  Ardrone_InputCommand_linearVelocity = tf::Vector3(ux, uy, uz);
-	  Ardrone_InputCommand_angularVelocity = tf::Vector3(0.0, 0.0, ut);
-
-	  ardrone_commanded = true;
- 	  commandTwist.angular.x = commandTwist.angular.y = 0.1;	// Do not allow to enter auto-hover mode
-
-	  Ardrone_InputCommand_linearVelocity = tf::Vector3(0.0, 0.0, 0.0);
-	  Ardrone_InputCommand_angularVelocity = tf::Vector3(0.0, 0.0, 0.0);
-	  
- 	  
-// 	  outFile << rest_timer<<" "<<ux<<" "<<uy<<" "<<uz<<" "<<ut<<" "<<std::endl;
-	}
-	// TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
-
-	
 
 	// Ardrone is flying: Land it
 // 	if ( ardrone_state > ARDRONE_LANDED  &&  ardrone_state != ARDRONE_LANDING  &&  !ardrone_commanded_to_land_but_not_landed )
@@ -472,121 +449,6 @@ int main(int argc, char *argv[])
       case STATE_TRACK:
       {
 	track_timer += period_real;
-	
-	try
-	{
-	  
-// 	  // TCP tracking **********************************************************************
-// 	  
-// 	  Eigen::VectorXd u_drone(computeDroneVelocityCommand(time_diff, TF_drone_tcp, pastTF_drone_tcp, desired_TF_drone_tcp, pastDesired_TF_drone_tcp));
-// 	  double ux = u_drone(0);
-// 	  double uy = u_drone(1);
-// 	  double uz = u_drone(2);
-// 	  double ut = u_drone(3);
-// 
-// 	  Ardrone_InputCommand_linearVelocity = tf::Vector3(ux, uy, uz);
-// 	  Ardrone_InputCommand_angularVelocity = tf::Vector3(0.0, 0.0, ut);
-// 
-// 	  ardrone_commanded = true;
-// 	  commandTwist.angular.x = commandTwist.angular.y = 0.1;	// Do not allow to enter auto-hover mode
-// 
-// 	  Ardrone_InputCommand_linearVelocity = tf::Vector3(0.0, 0.0, 0.0);
-// 	  Ardrone_InputCommand_angularVelocity = tf::Vector3(0.0, 0.0, 0.0);
-// 	  
-// 	  outFile << track_timer<<" - "<<ux<<" "<<uy<<" "<<uz<<" | "<<RAD_TO_DEG(ut)<<" "<<std::endl;
-// 	  
-// // 	  // PLOT
-// // // 	  tf::StampedTransform TF_prov;
-// // // 	  TFListener.lookupTransform("/camera", "/ardrone_base_frontcam", ros::Time(0), TF_prov);
-// // 	  
-// // // // 	  ROS_INFO("- TRACK ------------------------------------------");
-// // // // //  	  ROS_INFO("time nT T: %f %f %f", ros::Time::now().toSec(), period, time_diff);
-// // // // 	  ROS_INFO("DrnTCP P : %f %f %f", TF_drone_tcp.getOrigin().x(), TF_drone_tcp.getOrigin().y(), TF_drone_tcp.getOrigin().z());
-// // // // 	  ROS_INFO("DesDrnTCP: %f %f %f", desired_TF_drone_tcp.getOrigin().x(), desired_TF_drone_tcp.getOrigin().y(), desired_TF_drone_tcp.getOrigin().z());	  
-// // // // 	  ROS_INFO("x y z t  : %f %f %f %f", x, y, z, t*(180/PI));
-// // // // 	  ROS_INFO("r-x y z t: %f %f %f %f", rx, ry, rz, rt*(180/PI));
-// // // // 	  ROS_INFO("u-x y z t: %f %f %f %f", ux, uy, uz, ut*(180/PI));
-// // //  	  ROS_INFO("tcp cam  : %f %f %f", TF_tcp_cam.getOrigin().x(), TF_tcp_cam.getOrigin().y(), TF_tcp_cam.getOrigin().z());
-// // // //   	  ROS_INFO("cam tcp  : %f %f %f", TF_cam_tcp.getOrigin().x(), TF_cam_tcp.getOrigin().y(), TF_cam_tcp.getOrigin().z());
-// // // // // // 	  ROS_INFO("prov     : %f %f %f", TF_prov.getOrigin().x(), TF_prov.getOrigin().y(), TF_prov.getOrigin().z());
-// // // //  	  ROS_INFO("desP     : %f %f %f", desired_TF_cam_tcp.getOrigin().x(), desired_TF_cam_tcp.getOrigin().y(), desired_TF_cam_tcp.getOrigin().z());	  
-// // // //  	  ROS_INFO("desTwistP: %f %f %f", desiredCamToTcp_TwistPosition.x(), desiredCamToTcp_TwistPosition.y(), desiredCamToTcp_TwistPosition.z());
-// // // // // 	  ROS_INFO("desTwistO: %f %f %f", desiredCamToTcp_TwistAngular.x(), desiredCamToTcp_TwistAngular.y(), desiredCamToTcp_TwistAngular.z());	  
-// // // //  	  ROS_INFO("error    : %f %f %f", Kp*CamToTcpPose_Error.getOrigin().x(), Kp*CamToTcpPose_Error.getOrigin().y(), Kp*CamToTcpPose_Error.getOrigin().z());
-// // // // //  	  ROS_INFO("base2cam : %f %f %f", TF_drone_cam.getOrigin().x(), TF_drone_cam.getOrigin().y(), TF_drone_cam.getOrigin().z() );
-// // // // // //  	  ROS_INFO("quat     : %f | %f %f %f", TF_drone_cam.getRotation().w(), TF_drone_cam.getRotation().x(), TF_drone_cam.getRotation().y(), TF_drone_cam.getRotation().z() );
-// // // 	  ROS_INFO("mat row1 : %f %f %f", TF_drone_tcp.getBasis().getRow(0).x(), TF_drone_tcp.getBasis().getRow(0).y(), TF_drone_tcp.getBasis().getRow(0).z());
-// // // 	  ROS_INFO("mat row2 : %f %f %f", TF_drone_tcp.getBasis().getRow(1).x(), TF_drone_tcp.getBasis().getRow(1).y(), TF_drone_tcp.getBasis().getRow(1).z());
-// // // 	  ROS_INFO("mat row3 : %f %f %f", TF_drone_tcp.getBasis().getRow(2).x(), TF_drone_tcp.getBasis().getRow(2).y(), TF_drone_tcp.getBasis().getRow(2).z());
-// // // // 	  ROS_INFO("<-in vel : %f %f %f", Ardrone_InputCommand_linearVelocity.x(), Ardrone_InputCommand_linearVelocity.y(), Ardrone_InputCommand_linearVelocity.z());
-// // // // // 	  ROS_INFO("<-in vel : %f %f %f", Ardrone_InputCommand_angularVelocity.x(), Ardrone_InputCommand_angularVelocity.y(), Ardrone_InputCommand_angularVelocity.z());
-// // // 	  ROS_INFO("<-inputP: %f %f %f", commandTwist.linear.x, commandTwist.linear.y, commandTwist.linear.z);
-// 	  // TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
-
-	  
-// 	  // Velocity normalizations
-// 	  //  Maximum velocities
-// 	  geometry_msgs::Twist maximumTwist;
-// 	  maximumTwist.linear.x = 2.0;	// m/s
-// 	  maximumTwist.linear.y = 2.0;	// m/s
-// 	  maximumTwist.linear.z = 2.0;	// m/s
-// 	  maximumTwist.angular.z = DEG_TO_RAD(180.0);	// rad/s
-// 	  //  Linear velocity
-// 	  if (fabs(Ardrone_InputCommand_linearVelocity.x()) > maximumTwist.linear.x)	
-// 		commandTwist.linear.x = sgn(Ardrone_InputCommand_linearVelocity.x())*maximumTwist.linear.x;
-// 	  else	commandTwist.linear.x = Ardrone_InputCommand_linearVelocity.x();
-// 	  if (fabs(Ardrone_InputCommand_linearVelocity.y()) > maximumTwist.linear.y)
-// 		commandTwist.linear.y = sgn(Ardrone_InputCommand_linearVelocity.y())*maximumTwist.linear.y;
-// 	  else	commandTwist.linear.y = Ardrone_InputCommand_linearVelocity.y();
-// 	  if (fabs(Ardrone_InputCommand_linearVelocity.z()) > maximumTwist.linear.z)
-// 		commandTwist.linear.z = sgn(Ardrone_InputCommand_linearVelocity.z())*maximumTwist.linear.z;
-// 	  else	commandTwist.linear.z = Ardrone_InputCommand_linearVelocity.z();
-// 	  //  Angular velocity
-// 	  if (fabs(Ardrone_InputCommand_angularVelocity.z()) > maximumTwist.angular.z)
-// 		commandTwist.angular.z = sgn(Ardrone_InputCommand_angularVelocity.z())*maximumTwist.angular.z;
-// 	  else	commandTwist.angular.z = Ardrone_InputCommand_angularVelocity.z();
-
-// 	  commandTwist.linear.x *= 0.1;
-// 	  commandTwist.linear.y *= 0.1;
-// 	  commandTwist.linear.z *= 0.1;
-
-// 	  commandTwist.linear.x = 0.0;
-// 	  commandTwist.linear.y = 0.1*sin(2*PI*0.2*track_timer);
-// 	  commandTwist.linear.z = 0.0;
-	  
-	  	  
-// 	  ROS_INFO("<-input: %f %f %f / %f %f %f", commandTwist.linear.x, commandTwist.linear.y, commandTwist.linear.z, 
-// 						   commandTwist.angular.x, commandTwist.angular.y, commandTwist.angular.z);
-// 	  ROS_INFO("<-input: %f ", commandTwist.angular.z);
-	  
-// // 	  if (move_on_track)
-// // 	  {
-// // 	    move_on_track_timer += period_real;
-// // // 	    ROS_INFO("in move_on_track");
-// // // 	    ROS_INFO("move_on_track timer: %f", move_on_track_timer);
-// // 	    ardrone_commanded = true;
-// // 	    commandTwist.linear.x = 0.0;
-// // 	    commandTwist.linear.y = 0.15*(1.0/2.0)*(PI/2.0)*(PI/2.0)* sin(PI - (PI/2.0)*move_on_track_timer);
-// // 	    commandTwist.linear.z = 0.0;
-// // 	    commandTwist.angular.x = commandTwist.angular.y = 0.0;
-// // 	    commandTwist.angular.z = -0.3*(1.0/2.0)*(PI/2.0)*(PI/2.0)* sin(PI - (PI/2.0)*move_on_track_timer);;
-// // 	  }
-// // 	  else
-// // 	  {
-// // 	    move_on_track_timer = 0.0;
-// // 	    ardrone_commanded = true;
-// // 	    commandTwist.linear.x = 0.0;
-// // 	    commandTwist.linear.y = 0.0;
-// // 	    commandTwist.linear.z = 0.0;
-// // 	    commandTwist.angular.x = commandTwist.angular.y = 0.0;
-// // 	    commandTwist.angular.z = 0.0;
-// // 	  }
-	  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	}
-	catch (tf::TransformException ex){
-	  ROS_ERROR("%s",ex.what());
-	  ros::Duration(1.0).sleep();
-	}
 	
 	//   State machine transitions
 	if (track_tcp)

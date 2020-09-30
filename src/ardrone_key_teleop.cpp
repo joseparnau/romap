@@ -1,3 +1,10 @@
+/*
+ * 
+ * ROS node to command a Parrot Ardrone using a keyboard.
+ * 
+ */
+
+
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Empty.h>
